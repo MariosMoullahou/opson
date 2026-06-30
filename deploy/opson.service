@@ -1,0 +1,17 @@
+[Unit]
+Description=Opson demo (gunicorn)
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/opson
+Environment="PATH=/var/www/opson/venv/bin"
+ExecStart=/var/www/opson/venv/bin/gunicorn \
+    --workers 3 \
+    --bind unix:/run/opson.sock \
+    opson.wsgi:application
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
