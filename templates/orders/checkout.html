@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="container" style="padding: 36px 24px;">
+  <h1 class="page-title">Ολοκλήρωση Παραγγελίας</h1>
+  <p class="page-subtitle" style="margin-bottom: 28px;">Συμπλήρωσε τα στοιχεία αποστολής. Η παραγγελία σου θα σταλεί σε όλους τους παραγωγούς για επιβεβαίωση.</p>
+
+  <div style="display:grid;grid-template-columns:2fr 1fr;gap:24px;">
+    <form method="post" class="panel">
+      {% csrf_token %}
+      <div class="form-group">
+        <label class="form-label">Ονοματεπώνυμο</label>
+        <input name="full_name" required value="{{ user.get_full_name|default:user.username }}" class="form-input">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Τηλέφωνο</label>
+        <input name="phone" required class="form-input" placeholder="π.χ. +30 210 1234567">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Διεύθυνση παράδοσης</label>
+        <input name="address" required class="form-input" placeholder="Οδός, αριθμός, πόλη, ΤΚ">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Σημειώσεις (προαιρετικά)</label>
+        <textarea name="notes" rows="3" class="form-textarea" placeholder="Οδηγίες για τους παραγωγούς..."></textarea>
+      </div>
+      <div class="alert alert-info" style="margin: 16px 0;">
+        💡 <b>Demo MVP:</b> δεν απαιτείται πληρωμή. Η παραγγελία θα δημιουργηθεί σε κατάσταση <b>«Σε εκκρεμότητα»</b> για επιβεβαίωση από τον παραγωγό.
+      </div>
+      <button class="btn-primary" type="submit" style="width:100%;padding:14px;font-size:1rem;">✓ Κατοχύρωση Παραγγελίας</button>
+    </form>
+
+    <aside class="panel" style="height: fit-content;">
+      <h2 style="font-size:1rem;font-weight:700;color:var(--green-dark);margin-bottom:16px;">Σύνοψη</h2>
+      {% for producer, items in groups.items %}
+        <div style="font-size:.75rem;text-transform:uppercase;color:var(--text-light);margin-top:12px;font-weight:700;letter-spacing:.5px;">{{ producer.farm_name }}</div>
+        {% for item in items %}
+          <div style="display:flex;justify-content:space-between;font-size:.88rem;padding:4px 0;">
+            <span>{{ item.quantity }} × {{ item.product.name|truncatechars:24 }}</span>
+            <span>€{{ item.line_total }}</span>
+          </div>
+        {% endfor %}
+      {% endfor %}
+      <div style="display:flex;justify-content:space-between;font-weight:800;margin-top:16px;padding-top:16px;border-top:2px solid var(--cream-dark);font-size:1.1rem;">
+        <span>Σύνολο</span><span style="color:var(--green-dark);">€{{ total }}</span>
+      </div>
+    </aside>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}{{ producer.farm_name }} — Opson{% endblock %}
+
+{% block content %}
+<section class="producer-hero">
+  {% if producer.cover_url %}
+    <img src="{{ producer.cover_url }}" alt="" class="producer-hero-cover">
+  {% else %}
+    <div class="producer-hero-cover producer-hero-fallback">🌾</div>
+  {% endif %}
+  <div class="producer-hero-overlay"></div>
+  <div class="container producer-hero-inner">
+    <a href="{% url 'home' %}" class="producer-hero-back">← Όλοι οι παραγωγοί</a>
+    <div class="producer-hero-content">
+      <div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;">
+          {% if producer.badge %}
+            <span class="badge {% if producer.badge == 'bio' %}badge-green{% elif producer.badge == 'pdo' %}badge-earth{% else %}badge-amber{% endif %}">{{ producer.get_badge_display }}</span>
+          {% endif %}
+          {% if producer.agroverify_id %}
+            <span class="badge badge-green" title="Εγγεγραμμένος παραγωγός στο εθνικό σύστημα ιχνηλασιμότητας Agro-Verify (ΥΠΨηΔ/ΥΠΑΑΤ/ΕΛΓΟ/ΕΦΕΤ).">🛰️ Agro-Verify · {{ producer.agroverify_id }}</span>
+          {% else %}
+            <span class="badge badge-amber" title="Το Opson είναι έτοιμο να ενσωματώσει το εθνικό σύστημα ιχνηλασιμότητας Agro-Verify μόλις ανοίξει το δημόσιο API.">🛰️ Agro-Verify Ready</span>
+          {% endif %}
+        </div>
+        <h1 class="producer-hero-name">{{ producer.farm_name }}</h1>
+        <div class="producer-hero-loc">📍 {{ producer.location }}</div>
+        <div class="producer-hero-rating">
+          <span class="star">{% for _ in ""|center:producer.stars_full %}★{% endfor %}{% for _ in ""|center:producer.stars_empty %}☆{% endfor %}</span>
+          <span class="rating-val" style="color:#fff;">{{ producer.rating }}</span>
+          <span style="color:rgba(255,255,255,.7);font-size:.85rem;">({{ producer.rating_count }} κριτικές)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="container" style="padding: 36px 24px;">
+
+  {% if producer.bio %}
+    <div class="panel" style="margin-bottom: 32px;">
+      <p style="color: var(--text-mid); line-height: 1.7; font-size: .95rem;">{{ producer.bio }}</p>
+    </div>
+  {% endif %}
+
+  {# ── PRODUCTS ── #}
+  <div class="modal-section-title">
+    <span>🛒 Προϊόντα του παραγωγού</span>
+  </div>
+  <div class="products-grid" style="margin-bottom: 48px;">
+    {% for p in products %}
+      <div class="product-card">
+        <a href="{% url 'product_detail' p.pk %}" style="display:block;">
+          {% if p.image_url %}
+            <img src="{{ p.image_url }}" alt="{{ p.name }}" class="product-img">
+          {% else %}
+            <div class="product-img-fallback">{{ p.emoji|default:"🌾" }}</div>
+          {% endif %}
+        </a>
+        <div class="product-info">
+          <div class="product-name">{{ p.name }}</div>
+          <div class="product-unit">{{ p.unit_label|default:p.get_unit_display }}</div>
+          <div class="product-price">€{{ p.price }}</div>
+          <form method="post" action="{% url 'cart_add' p.pk %}" style="margin-top:auto;">
+            {% csrf_token %}
+            <input type="hidden" name="quantity" value="1">
+            <button class="product-add" type="submit" {% if p.stock == 0 %}disabled{% endif %}>
+              {% if p.stock == 0 %}Εξαντλήθηκε{% else %}+ Καλάθι{% endif %}
+            </button>
+          </form>
+        </div>
+      </div>
+    {% empty %}
+      <p style="color: var(--text-light);">Δεν υπάρχουν προϊόντα αυτή τη στιγμή.</p>
+    {% endfor %}
+  </div>
+
+  {# ── REVIEWS (static demo content) ── #}
+  <div class="modal-section-title">
+    <span>⭐ Κριτικές Πελατών</span>
+  </div>
+  <div class="reviews-list">
+    {% for r in reviews %}
+      <div class="review-item">
+        <div class="review-top">
+          <div class="reviewer">
+            <div class="reviewer-avatar">{{ r.initial }}</div>
+            <div>
+              <div class="reviewer-name">{{ r.name }}</div>
+              <div class="reviewer-date">{{ r.date }}</div>
+            </div>
+          </div>
+        </div>
+        <div class="review-stars">
+          {% for _ in ""|center:r.stars %}<span style="color:var(--amber);">★</span>{% endfor %}{% for _ in ""|center:r.empty_stars %}<span style="color:#ddd;">★</span>{% endfor %}
+        </div>
+        <div class="review-text">{{ r.text }}</div>
+        {% if r.verified %}<div class="review-verified">✓ Επαληθευμένη αγορά</div>{% endif %}
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="review-form">
+    <h4>Γράψε τη δική σου κριτική</h4>
+    <div class="star-select" id="starSelect">
+      {% for n in "12345" %}<button type="button" class="star-btn" data-stars="{{ forloop.counter }}">★</button>{% endfor %}
+    </div>
+    <textarea class="review-textarea" placeholder="Μοιράσου την εμπειρία σου με αυτόν τον παραγωγό..."></textarea>
+    <button type="button" class="review-submit" onclick="window.gaiaToast &amp;&amp; window.gaiaToast('Η κριτική σου καταχωρήθηκε! Ευχαριστούμε.')">Δημοσίευση Κριτικής</button>
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll('#starSelect .star-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const n = parseInt(btn.dataset.stars, 10);
+      document.querySelectorAll('#starSelect .star-btn').forEach((b, i) => b.classList.toggle('active', i < n));
+    });
+  });
+</script>
+{% endblock %}

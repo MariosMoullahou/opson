@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<section class="hero">
+  <div class="hero-content">
+    <h1>Φρέσκα προϊόντα<br><em>απευθείας</em> από τον παραγωγό</h1>
+    <p>Ανακάλυψε τοπικούς αγρότες και παραγωγούς. Στήριξε την ελληνική γη και απόλαυσε φρέσκα, αυθεντικά προϊόντα.</p>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-num">{{ stats.producers }}+</div>
+        <div class="hero-stat-label">Παραγωγοί</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">{{ stats.products }}+</div>
+        <div class="hero-stat-label">Προϊόντα</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">{{ stats.regions }}</div>
+        <div class="hero-stat-label">Περιοχές</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">{{ stats.customers }}</div>
+        <div class="hero-stat-label">Πελάτες</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{# ── REELS ── #}
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <div class="section-title">🎬 Reels Παραγωγών</div>
+        <div class="section-subtitle">Δες τους παραγωγούς στη δουλειά τους — ζωντανά από τα χωράφια</div>
+      </div>
+    </div>
+    <div class="reels-track">
+      {% for reel in reels %}
+        <button type="button" class="reel-card"
+                data-reel-url="{{ reel.url }}"
+                data-reel-title="{{ reel.name }}"
+                data-reel-producer="📍 {{ reel.loc }}">
+          <video class="reel-thumb" src="{{ reel.url }}" autoplay muted loop playsinline></video>
+          <div class="reel-overlay"></div>
+          <div class="reel-play">▶</div>
+          <div class="reel-info">
+            <div class="reel-name">{{ reel.name }}</div>
+            <div class="reel-loc">📍 {{ reel.loc }}</div>
+            <div class="reel-views">👁 {{ reel.views }} προβολές</div>
+          </div>
+        </button>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{# ── PRODUCERS GRID ── #}
+<section class="section" style="background: var(--white);">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <div class="section-title">🌾 Οι Παραγωγοί μας</div>
+        <div class="section-subtitle">Κάνε κλικ για να δεις τα προϊόντα του κάθε παραγωγού</div>
+      </div>
+    </div>
+
+    {% if search_query or active_category %}
+      <p style="color: var(--text-light); margin-bottom: 16px;">
+        {% if search_query %}Αποτελέσματα για "<b>{{ search_query }}</b>" — {% endif %}{{ producers|length }} παραγωγ{{ producers|length|pluralize:"ός,οί" }}
+      </p>
+    {% endif %}
+
+    <div class="producers-grid">
+      {% for p in producers %}
+        <a href="{% url 'producer_detail' p.slug %}" class="producer-card">
+          <div class="producer-cover-wrap">
+            {% if p.cover_url %}
+              <img src="{{ p.cover_url }}" alt="{{ p.farm_name }}" class="producer-cover">
+            {% else %}
+              <div class="producer-cover-fallback">🌾</div>
+            {% endif %}
+            {% if p.badge %}
+              <div class="producer-tag">
+                <span class="badge {% if p.badge == 'bio' %}badge-green{% elif p.badge == 'pdo' %}badge-earth{% else %}badge-amber{% endif %}">{{ p.get_badge_display }}</span>
+              </div>
+            {% endif %}
+          </div>
+          <div class="producer-body">
+            <div class="producer-name">{{ p.farm_name }}</div>
+            <div class="producer-loc">📍 {{ p.location }}</div>
+            <div class="producer-rating">
+              <span class="star">{% for _ in ""|center:p.stars_full %}★{% endfor %}{% for _ in ""|center:p.stars_empty %}☆{% endfor %}</span>
+              <span class="rating-val">{{ p.rating }}</span>
+              <span class="rating-count">({{ p.rating_count }} κριτικές)</span>
+            </div>
+            <div class="producer-desc">{{ p.bio|truncatewords:22 }}</div>
+            <div class="producer-products-preview">
+              {% for prod in p.products.all|slice:":3" %}
+                <span class="product-chip">{{ prod.name|truncatechars:18 }}</span>
+              {% endfor %}
+            </div>
+            <div class="producer-btn">Δες τα προϊόντα →</div>
+          </div>
+        </a>
+      {% empty %}
+        <p style="color: var(--text-light);">Δεν βρέθηκαν παραγωγοί με αυτά τα κριτήρια.</p>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{# ── EVENTS ── #}
+<section class="section" id="events">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <div class="section-title">📅 Εκδηλώσεις Συγκομιδής</div>
+        <div class="section-subtitle">Έλα να ζήσεις την εμπειρία — βοήθησε στη συγκομιδή &amp; γνώρισε τους παραγωγούς</div>
+      </div>
+    </div>
+    <div class="events-grid">
+      {% for ev in events %}
+        <div class="event-card">
+          <div class="event-image-wrap">
+            <img src="{{ ev.image }}" alt="{{ ev.title }}" class="event-image">
+            <div class="event-date-badge">
+              <div class="event-date-day">{{ ev.day }}</div>
+              <div class="event-date-month">{{ ev.month }}</div>
+            </div>
+          </div>
+          <div class="event-body">
+            <div class="event-type"><span class="badge {{ ev.badge_class }}">{{ ev.type }}</span></div>
+            <div class="event-title">{{ ev.title }}</div>
+            <div class="event-detail"><span class="icon">📍</span> {{ ev.location }}</div>
+            <div class="event-detail"><span class="icon">⏰</span> {{ ev.time }}</div>
+            <div class="event-detail"><span class="icon">👥</span> Έως {{ ev.capacity }} συμμετέχοντες</div>
+            <div class="event-desc">{{ ev.desc }}</div>
+            <div class="event-footer">
+              <div class="event-attendees">{{ ev.attending }}/{{ ev.capacity }} θέσεις</div>
+              <button class="event-btn" type="button" onclick="this.textContent='✓ Εγγεγραμμένος';this.disabled=true;">Εγγραφή</button>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+<div class="video-modal-overlay" id="videoModal" aria-hidden="true">
+  <div class="video-modal">
+    <button type="button" class="video-modal-close" id="videoClose" aria-label="Κλείσιμο">✕</button>
+    <div id="videoSlot"></div>
+    <div class="video-modal-meta">
+      <div class="video-modal-title" id="videoTitle"></div>
+      <div class="video-modal-producer" id="videoProducer"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    const overlay = document.getElementById('videoModal');
+    const slot = document.getElementById('videoSlot');
+    const titleEl = document.getElementById('videoTitle');
+    const producerEl = document.getElementById('videoProducer');
+    const closeBtn = document.getElementById('videoClose');
+
+    function open(url, title, producer) {
+      titleEl.textContent = title || '';
+      producerEl.textContent = producer || '';
+      slot.innerHTML = '';
+      const v = document.createElement('video');
+      v.src = url;
+      v.controls = true;
+      v.autoplay = true;
+      v.playsInline = true;
+      slot.appendChild(v);
+      overlay.classList.add('open');
+      overlay.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function close() {
+      overlay.classList.remove('open');
+      overlay.setAttribute('aria-hidden', 'true');
+      slot.innerHTML = '';
+      document.body.style.overflow = '';
+    }
+
+    document.querySelectorAll('.reel-card').forEach(card => {
+      card.addEventListener('click', () => {
+        open(card.dataset.reelUrl, card.dataset.reelTitle, card.dataset.reelProducer);
+      });
+    });
+    closeBtn.addEventListener('click', close);
+    overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+
+    document.querySelectorAll('.event-btn').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.preventDefault();
+        e.stopPropagation();
+        btn.textContent = '✓ Εγγεγραμμένος';
+        btn.disabled = true;
+        if (window.gaiaToast) window.gaiaToast('Η εγγραφή σου καταχωρήθηκε!');
+      });
+    });
+  })();
+</script>
+{% endblock %}

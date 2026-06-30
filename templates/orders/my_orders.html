@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="container" style="padding: 36px 24px;">
+  <h1 class="page-title">Οι παραγγελίες μου</h1>
+  <p class="page-subtitle" style="margin-bottom: 24px;">Παρακολούθηση κατάστασης κάθε παραγγελίας.</p>
+
+  {% if not orders %}
+    <div class="panel" style="text-align: center; padding: 48px;">
+      <div style="font-size: 3rem; margin-bottom: 12px;">📦</div>
+      <p style="color: var(--text-light); margin-bottom: 16px;">Δεν έχεις κάνει ακόμα καμία παραγγελία.</p>
+      <a href="{% url 'home' %}" class="btn-primary">Ξεκίνα τις αγορές σου</a>
+    </div>
+  {% else %}
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      {% for o in orders %}
+        <a href="{% url 'order_detail' o.pk %}" class="panel" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+          <div>
+            <div style="font-weight:700;">Παραγγελία #{{ o.pk }}</div>
+            <div style="font-size:.82rem;color:var(--text-light);">{{ o.created_at|date:"d M Y, H:i" }} · {{ o.sub_orders.count }} παραγωγ{{ o.sub_orders.count|pluralize:"ός,οί" }}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:14px;">
+            <span class="badge-status status-{{ o.aggregate_status }}">{{ o.get_aggregate_status_display|default:o.aggregate_status }}</span>
+            <span style="font-weight:800;font-size:1.1rem;color:var(--green-dark);">€{{ o.total }}</span>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,141 @@
+{% load static %}
+<!doctype html>
+<html lang="el">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Opson — Τοπικοί Παραγωγοί{% endblock %}</title>
+  <link rel="icon" type="image/svg+xml" href="{% static 'img/o_noborder.svg' %}">
+  <link rel="stylesheet" href="{% static 'css/gaiaroots.css' %}">
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <a href="{% url 'home' %}" class="logo-placeholder">
+      <img src="{% static 'img/opson(1).svg' %}" alt="Opson" class="logo-img">
+    </a>
+    <form class="search-bar" method="get" action="{% url 'home' %}">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-light)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" name="q" placeholder="Ψάξε παραγωγό, προϊόν, περιοχή..." value="{{ request.GET.q|default:'' }}">
+      <button class="search-btn" type="submit">Αναζήτηση</button>
+    </form>
+    <nav class="header-nav">
+      {% if user.is_authenticated %}
+        {% if user.is_producer %}
+          <a href="{% url 'producer_dashboard' %}" class="nav-btn nav-btn-amber">
+            <span>🌾 Πίνακας Παραγωγού</span>
+          </a>
+        {% else %}
+          <a href="{% url 'my_orders' %}" class="nav-btn nav-btn-outline">
+            <span>📦 Παραγγελίες</span>
+          </a>
+        {% endif %}
+        <a href="{% url 'cart' %}" class="nav-btn nav-btn-filled">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          <span>Καλάθι</span>{% if cart.count %} <span class="cart-count">{{ cart.count }}</span>{% endif %}
+        </a>
+        <form method="post" action="{% url 'logout' %}" style="display:inline;">{% csrf_token %}
+          <button class="nav-btn nav-btn-outline" type="submit" title="{{ user.username }}">Έξοδος</button>
+        </form>
+      {% else %}
+        <a href="{% url 'login' %}" class="nav-btn nav-btn-outline">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span>Σύνδεση</span>
+        </a>
+        <a href="{% url 'cart' %}" class="nav-btn nav-btn-filled">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          <span>Καλάθι</span>{% if cart.count %} <span class="cart-count">{{ cart.count }}</span>{% endif %}
+        </a>
+      {% endif %}
+    </nav>
+  </div>
+</header>
+
+{% block category_nav %}
+<nav class="cat-nav">
+  <div class="cat-nav-inner">
+    <a href="{% url 'home' %}" class="cat-item {% if not active_category %}active{% endif %}">🌿 Όλα</a>
+    {% for c in categories %}
+      <a href="?category={{ c.slug }}" class="cat-item {% if active_category == c.slug %}active{% endif %}">{{ c.emoji }} {{ c.name }}</a>
+    {% endfor %}
+  </div>
+</nav>
+{% endblock %}
+
+<main>
+  {% block content %}{% endblock %}
+</main>
+
+<div class="toast" id="gaiaToast" role="status" aria-live="polite"></div>
+
+<script>
+  (function () {
+    const toastEl = document.getElementById('gaiaToast');
+    let toastTimer;
+    window.gaiaToast = function (msg, type) {
+      if (!toastEl) return;
+      toastEl.textContent = msg;
+      toastEl.classList.remove('toast-error', 'toast-info');
+      if (type === 'error') toastEl.classList.add('toast-error');
+      else if (type === 'info') toastEl.classList.add('toast-info');
+      toastEl.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toastEl.classList.remove('show'), 3000);
+    };
+  })();
+</script>
+
+{% if messages %}
+<script>
+  (function () {
+    const queue = [
+      {% for m in messages %}{ msg: "{{ m|escapejs }}", type: "{{ m.tags|default:'success'|escapejs }}" }{% if not forloop.last %},{% endif %}
+      {% endfor %}
+    ];
+    queue.forEach((item, i) => setTimeout(() => window.gaiaToast(item.msg, item.type), i * 350));
+  })();
+</script>
+{% endif %}
+
+<footer class="footer">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <img src="{% static 'img/opson(1).svg' %}" alt="Opson" style="height:64px;width:auto;display:block;">
+      <p>Συνδέουμε τοπικούς παραγωγούς με καταναλωτές που εκτιμούν την ποιότητα, την αυθεντικότητα και τη βιώσιμη γεωργία.</p>
+    </div>
+    <div>
+      <div class="footer-title">Για Αγοραστές</div>
+      <div class="footer-links">
+        <a href="{% url 'home' %}">Πώς λειτουργεί</a>
+        <a href="{% url 'home' %}">Βρες παραγωγό</a>
+        <a href="{% url 'home' %}#events">Εκδηλώσεις</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-title">Για Παραγωγούς</div>
+      <div class="footer-links">
+        <a href="{% url 'signup' %}">Γίνε μέλος</a>
+        {% if user.is_authenticated and user.is_producer %}
+          <a href="{% url 'producer_product_create' %}">Πρόσθεσε προϊόν</a>
+          <a href="{% url 'producer_dashboard' %}">Πίνακας</a>
+        {% endif %}
+      </div>
+    </div>
+    <div>
+      <div class="footer-title">Υποστήριξη</div>
+      <div class="footer-links">
+        <a href="#">Επικοινωνία</a>
+        <a href="#">Πολιτική απορρήτου</a>
+        <a href="#">Όροι χρήσης</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 Opson — Από την ελληνική γη, για σένα.</span>
+    <span>🌿 Στηρίζουμε τη βιώσιμη &amp; τοπική γεωργία</span>
+  </div>
+</footer>
+
+</body>
+</html>

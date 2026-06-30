@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block category_nav %}{% endblock %}
+
+{% block content %}
+<section class="container" style="padding: 36px 24px;">
+
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+    <div>
+      <h1 class="page-title">🌾 {{ producer.farm_name }}</h1>
+      <p class="page-subtitle">📍 {{ producer.location }} · Πίνακας Παραγωγού</p>
+    </div>
+    <a href="{% url 'producer_product_create' %}" class="btn-primary">+ Νέο προϊόν</a>
+  </div>
+
+  <h2 class="section-title" style="margin-bottom: 16px;">📦 Ενεργές παραγγελίες ({{ active_sub_orders|length }})</h2>
+  {% if not active_sub_orders %}
+    <div class="panel"><p style="color: var(--text-light);">Δεν υπάρχουν ενεργές παραγγελίες αυτή τη στιγμή.</p></div>
+  {% else %}
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      {% for sub in active_sub_orders %}
+        <div class="panel">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+            <div>
+              <div style="font-weight:700;">Παραγγελία #{{ sub.order.pk }}</div>
+              <div style="font-size:.85rem;color:var(--text-mid);">{{ sub.order.full_name }} · 📞 {{ sub.order.phone }}</div>
+              <div style="font-size:.82rem;color:var(--text-light);">📍 {{ sub.order.address }}</div>
+            </div>
+            <span class="badge-status status-{{ sub.status }}">{{ sub.get_status_display }}</span>
+          </div>
+          <div style="border-top:1px solid var(--cream-dark);padding-top:10px;font-size:.9rem;">
+            {% for item in sub.items.all %}
+              <div style="display:flex;justify-content:space-between;padding:3px 0;">
+                <span>{{ item.quantity }} × {{ item.product_name }} ({{ item.unit }})</span>
+                <span style="font-weight:600;">€{{ item.line_total }}</span>
+              </div>
+            {% endfor %}
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:14px;border-top:1px solid var(--cream-dark);flex-wrap:wrap;gap:10px;">
+            <div style="font-weight:700;">Υποσύνολο: €{{ sub.subtotal }}</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              {% for next_status in sub.allowed_next_statuses %}
+                <form method="post" action="{% url 'producer_transition_suborder' sub.pk %}">{% csrf_token %}
+                  <input type="hidden" name="status" value="{{ next_status }}">
+                  <button type="submit" class="{% if next_status == 'cancelled' %}btn-danger{% else %}btn-primary{% endif %}" style="padding: 8px 14px; font-size: .85rem;">
+                    {% if next_status == 'confirmed' %}✓ Επιβεβαίωση
+                    {% elif next_status == 'preparing' %}🔧 Σε προετοιμασία
+                    {% elif next_status == 'ready' %}📦 Έτοιμο
+                    {% elif next_status == 'out_for_delivery' %}🚚 Σε αποστολή
+                    {% elif next_status == 'delivered' %}✅ Παραδόθηκε
+                    {% elif next_status == 'cancelled' %}✕ Ακύρωση
+                    {% endif %}
+                  </button>
+                </form>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <h2 class="section-title" style="margin: 36px 0 16px;">🛒 Τα προϊόντα μου ({{ products|length }})</h2>
+  <div class="products-grid">
+    {% for p in products %}
+      <div class="product-card">
+        {% if p.image_url %}
+          <img src="{{ p.image_url }}" alt="" class="product-img">
+        {% else %}
+          <div class="product-img-fallback">{{ p.emoji|default:"🌾" }}</div>
+        {% endif %}
+        <div class="product-info">
+          <div class="product-name">{{ p.name }}</div>
+          <div class="product-unit">{{ p.unit_label|default:p.get_unit_display }} · απόθεμα: {{ p.stock }}</div>
+          <div class="product-price">€{{ p.price }}</div>
+        </div>
+      </div>
+    {% empty %}
+      <p style="color: var(--text-light);">Δεν έχεις προσθέσει ακόμα κανένα προϊόν.</p>
+    {% endfor %}
+  </div>
+
+  {% if history_sub_orders %}
+    <h2 class="section-title" style="margin: 36px 0 16px;">📜 Ιστορικό</h2>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      {% for sub in history_sub_orders %}
+        <div class="panel" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;font-size:.9rem;">
+          <span>Παραγγελία #{{ sub.order.pk }} — {{ sub.order.full_name }}</span>
+          <span class="badge-status status-{{ sub.status }}">{{ sub.get_status_display }}</span>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

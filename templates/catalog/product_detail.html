@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.name }} — {{ product.producer.farm_name }}{% endblock %}
+
+{% block content %}
+<section class="container" style="padding: 36px 24px;">
+
+  <a href="{% url 'producer_detail' product.producer.slug %}" class="see-all" style="display:inline-block;margin-bottom:18px;">← Πίσω στον {{ product.producer.farm_name }}</a>
+
+  <div class="product-detail-card">
+    <div class="product-detail-media">
+      {% if product.image_url %}
+        <img src="{{ product.image_url }}" alt="{{ product.name }}">
+      {% else %}
+        <div class="product-detail-fallback">{{ product.emoji|default:"🌾" }}</div>
+      {% endif %}
+      {% if product.producer.badge %}
+        <div class="product-detail-badge">
+          <span class="badge {% if product.producer.badge == 'bio' %}badge-green{% elif product.producer.badge == 'pdo' %}badge-earth{% else %}badge-amber{% endif %}">{{ product.producer.get_badge_display }}</span>
+        </div>
+      {% endif %}
+    </div>
+    <div class="product-detail-info">
+      <a href="{% url 'producer_detail' product.producer.slug %}" class="product-detail-producer">
+        🌾 {{ product.producer.farm_name }}
+        <span style="color:var(--text-light);font-weight:500;">· 📍 {{ product.producer.location }}</span>
+      </a>
+      <h1 class="product-detail-name">{{ product.name }}</h1>
+      {% if product.category %}
+        <div class="product-detail-cat">{{ product.category.emoji }} {{ product.category.name }}</div>
+      {% endif %}
+      {% if product.description %}
+        <p class="product-detail-desc">{{ product.description }}</p>
+      {% endif %}
+
+      <div class="product-detail-price-row">
+        <span class="product-detail-price">€{{ product.price }}</span>
+        <span class="product-detail-unit">/ {{ product.unit_label|default:product.get_unit_display }}</span>
+      </div>
+      <div class="product-detail-stock">
+        {% if product.stock %}
+          <span style="color:var(--green-mid);">●</span> {{ product.stock }} διαθέσιμα
+        {% else %}
+          <span style="color:#991b1b;">●</span> Εξαντλήθηκε
+        {% endif %}
+      </div>
+
+      <form method="post" action="{% url 'cart_add' product.pk %}" class="product-detail-form">
+        {% csrf_token %}
+        <input type="number" name="quantity" value="1" min="1" max="{{ product.stock }}" class="form-input" style="width:100px;text-align:center;">
+        <button class="btn-primary" type="submit" style="flex:1;padding:14px;font-size:1rem;" {% if product.stock == 0 %}disabled{% endif %}>
+          {% if product.stock == 0 %}Εξαντλήθηκε{% else %}🛒 Πρόσθεσε στο Καλάθι{% endif %}
+        </button>
+      </form>
+
+      <div class="product-detail-perks">
+        <div class="product-detail-perk"><span>🚚</span> Παράδοση από τον παραγωγό</div>
+        <div class="product-detail-perk"><span>🌿</span> Φρέσκο, εποχιακό προϊόν</div>
+        <div class="product-detail-perk"><span>💚</span> Στηρίζεις την τοπική παραγωγή</div>
+        <div class="product-detail-perk agroverify-row" title="Το Opson είναι έτοιμο να ενσωματώσει το εθνικό σύστημα ιχνηλασιμότητας Agro-Verify (ΥΠΨηΔ/ΥΠΑΑΤ/ΕΛΓΟ/ΕΦΕΤ) μόλις διατεθεί δημόσιο API.">
+          {% if product.agroverify_code %}
+            <span>🛰️</span>
+            <span>Επαληθευμένο μέσω <strong>Agro-Verify</strong> · κωδικός παρτίδας <code>{{ product.agroverify_code }}</code></span>
+          {% else %}
+            <span>🛰️</span>
+            <span><strong>Agro-Verify Ready</strong> · έτοιμο για το εθνικό σύστημα ιχνηλασιμότητας μόλις ανοίξει το API</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if related %}
+    <div class="modal-section-title" style="margin-top: 56px;">
+      <span>Άλλα προϊόντα από τον {{ product.producer.farm_name }}</span>
+    </div>
+    <div class="products-grid">
+      {% for p in related %}
+        <div class="product-card">
+          <a href="{% url 'product_detail' p.pk %}">
+            {% if p.image_url %}
+              <img src="{{ p.image_url }}" alt="{{ p.name }}" class="product-img">
+            {% else %}
+              <div class="product-img-fallback">{{ p.emoji|default:"🌾" }}</div>
+            {% endif %}
+          </a>
+          <div class="product-info">
+            <div class="product-name">{{ p.name }}</div>
+            <div class="product-unit">{{ p.unit_label|default:p.get_unit_display }}</div>
+            <div class="product-price">€{{ p.price }}</div>
+            <form method="post" action="{% url 'cart_add' p.pk %}" style="margin-top:auto;">
+              {% csrf_token %}
+              <input type="hidden" name="quantity" value="1">
+              <button class="product-add" type="submit" {% if p.stock == 0 %}disabled{% endif %}>
+                {% if p.stock == 0 %}Εξαντλήθηκε{% else %}+ Καλάθι{% endif %}
+              </button>
+            </form>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

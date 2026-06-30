@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="container" style="padding: 36px 24px;">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:12px;">
+    <h1 class="page-title">Παραγγελία #{{ order.pk }}</h1>
+    <span class="badge-status status-{{ order.aggregate_status }}">{{ order.get_aggregate_status_display|default:order.aggregate_status }}</span>
+  </div>
+  <p class="page-subtitle" style="margin-bottom: 24px;">Καταχωρήθηκε {{ order.created_at|date:"d M Y, H:i" }}</p>
+
+  <div class="panel" style="margin-bottom: 24px;">
+    <div style="font-weight:700;font-size:1.05rem;">{{ order.full_name }}</div>
+    <div style="color:var(--text-mid);">📞 {{ order.phone }}</div>
+    <div style="color:var(--text-mid);">📍 {{ order.address }}</div>
+    {% if order.notes %}<div style="margin-top:8px;color:var(--text-light);font-size:.9rem;">📝 {{ order.notes }}</div>{% endif %}
+  </div>
+
+  <h2 class="section-title" style="margin-bottom: 16px;">Παραγγελία ανά παραγωγό</h2>
+  {% for sub in order.sub_orders.all %}
+    <div class="panel" style="margin-bottom: 14px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+        <div>
+          <div style="font-weight:700;color:var(--green-dark);">🌾 {{ sub.producer.farm_name }}</div>
+          <div style="font-size:.8rem;color:var(--text-light);">Υπο-παραγγελία #{{ sub.pk }}</div>
+        </div>
+        <span class="badge-status status-{{ sub.status }}">{{ sub.get_status_display }}</span>
+      </div>
+      <div style="border-top:1px solid var(--cream-dark);padding-top:10px;">
+        {% for item in sub.items.all %}
+          <div style="display:flex;justify-content:space-between;font-size:.9rem;padding:3px 0;">
+            <span>{{ item.quantity }} × {{ item.product_name }} ({{ item.unit }})</span>
+            <span style="font-weight:600;">€{{ item.line_total }}</span>
+          </div>
+        {% endfor %}
+        <div style="display:flex;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px dashed var(--cream-dark);font-weight:700;">
+          <span>Υποσύνολο</span><span>€{{ sub.subtotal }}</span>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+
+  <div class="panel" style="background:var(--earth-dark);color:var(--white);border-color:var(--earth-dark);display:flex;align-items:center;justify-content:space-between;margin-top:24px;">
+    <span>Συνολικό ποσό</span>
+    <span style="font-size:1.6rem;font-weight:800;">€{{ order.total }}</span>
+  </div>
+</section>
+{% endblock %}

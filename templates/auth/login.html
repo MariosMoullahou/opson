@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block category_nav %}{% endblock %}
+
+{% block content %}
+<section class="container" style="padding: 60px 24px; max-width: 460px;">
+  <div class="panel">
+    <h1 style="font-size: 1.6rem; font-weight: 800; color: var(--green-dark); margin-bottom: 6px;">Σύνδεση</h1>
+    <p style="color: var(--text-light); font-size: .9rem; margin-bottom: 24px;">Καλώς ήρθες πίσω στο Opson.</p>
+    <form method="post" style="display:flex;flex-direction:column;gap:14px;">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+      <div class="form-group" style="margin:0;">
+        <label class="form-label">Όνομα χρήστη</label>
+        {{ form.username.errors }}
+        <input type="text" name="username" required class="form-input" autofocus>
+      </div>
+      <div class="form-group" style="margin:0;">
+        <label class="form-label">Κωδικός</label>
+        {{ form.password.errors }}
+        <input type="password" name="password" required class="form-input">
+      </div>
+      <button class="btn-primary" type="submit" style="padding:12px;margin-top:6px;">Σύνδεση</button>
+    </form>
+    <p style="font-size: .85rem; color: var(--text-light); margin-top: 18px; text-align: center;">
+      Νέος εδώ; <a href="{% url 'signup' %}" style="color: var(--green-dark); font-weight: 600;">Εγγραφή</a>
+    </p>
+  </div>
+</section>
+{% endblock %}

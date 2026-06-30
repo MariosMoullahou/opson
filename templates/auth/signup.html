@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block category_nav %}{% endblock %}
+
+{% block content %}
+<section class="container" style="padding: 60px 24px; max-width: 460px;">
+  <div class="panel">
+    <h1 style="font-size: 1.6rem; font-weight: 800; color: var(--green-dark); margin-bottom: 6px;">Εγγραφή</h1>
+    <p style="color: var(--text-light); font-size: .9rem; margin-bottom: 24px;">Δημιούργησε λογαριασμό αγοραστή.</p>
+    <form method="post" style="display:flex;flex-direction:column;gap:14px;">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+      {% for field in form %}
+        <div class="form-group" style="margin:0;">
+          <label class="form-label">{{ field.label }}</label>
+          {{ field.errors }}
+          {{ field }}
+          {% if field.help_text %}<small style="color: var(--text-light); font-size: .78rem;">{{ field.help_text|safe }}</small>{% endif %}
+        </div>
+      {% endfor %}
+      <button class="btn-primary" type="submit" style="padding:12px;">Δημιουργία λογαριασμού</button>
+    </form>
+  </div>
+</section>
+
+<style>
+  input[type="text"], input[type="password"], input[type="email"] {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid var(--cream-dark);
+    border-radius: var(--radius-sm);
+    background: var(--white);
+    color: var(--text-dark);
+  }
+  input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus {
+    outline: none;
+    border-color: var(--green-mid);
+  }
+  ul.errorlist { color: #991b1b; font-size: .82rem; list-style: none; padding: 0; margin: 0 0 6px; }
+</style>
+{% endblock %}
