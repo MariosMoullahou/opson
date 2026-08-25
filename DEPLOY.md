@@ -99,6 +99,22 @@ live demo, orders and all. Pass `--dry-run` to see what it would change first.
 To wipe the demo catalog instead, use `catalog_reset_demo` — the only command in the project that
 deletes anything. It refuses to run while any `Order` exists unless given `--force`.
 
+### Running the demo without S3
+
+Leave `AWS_STORAGE_BUCKET_NAME` blank in `.env` and Django writes uploads to `media/` on
+disk instead of S3 — no code change and no extra dependency. The nginx block in
+`deploy/nginx-demo.eopson.gr.conf` serves that directory at `/media/`, which is required
+because WhiteNoise does not serve user media and Django refuses to with `DEBUG=False`.
+
+Make sure the directory exists and gunicorn's user can write to it:
+
+```bash
+mkdir -p /var/www/opson/media && chown $USER:www-data /var/www/opson/media
+```
+
+Uploads on local disk are **not** backed up by anything. Fine for a demo; move to S3 before
+any real producer relies on it.
+
 ### Verify the media pipeline by hand
 
 Seed data leaves every image field blank, so nothing on deploy exercises uploads. Check it once,
