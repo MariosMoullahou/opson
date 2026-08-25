@@ -72,8 +72,15 @@ python -c "from django.core.management.utils import get_random_secret_key; print
 #   DEBUG=False
 #   ALLOWED_HOSTS=demo.eopson.gr
 #   CSRF_TRUSTED_ORIGINS=https://demo.eopson.gr
+#
+# Media: leave AWS_STORAGE_BUCKET_NAME blank to keep uploads on local disk,
+# or fill the bucket, region, CloudFront domain and AWS credentials to use S3.
 nano .env
 ```
+
+> **SECRET_KEY is now mandatory.** There is no fallback key any more: with `.env` missing or
+> `SECRET_KEY` unset the app raises `KeyError` on startup rather than silently booting in debug
+> mode with `ALLOWED_HOSTS=['*']`. If gunicorn will not start, check this first.
 
 ---
 
@@ -82,9 +89,29 @@ nano .env
 ```bash
 python manage.py migrate
 python manage.py collectstatic --noinput
-python manage.py seed          # load demo data
+python manage.py catalog_load_data     # load demo data (idempotent, safe to re-run)
 python manage.py createsuperuser
 ```
+
+`catalog_load_data` upserts on natural keys and never deletes, so it is safe to run again on a
+live demo, orders and all. Pass `--dry-run` to see what it would change first.
+
+To wipe the demo catalog instead, use `catalog_reset_demo` — the only command in the project that
+deletes anything. It refuses to run while any `Order` exists unless given `--force`.
+
+### Verify the media pipeline by hand
+
+Seed data leaves every image field blank, so nothing on deploy exercises uploads. Check it once,
+manually:
+
+1. Sign in as a producer and open **Dashboard → Επεξεργασία** on any product.
+2. Upload a JPEG or PNG and save.
+3. Confirm two `.webp` objects appear under `products/` in the bucket (or in `media/products/`
+   when running on local disk).
+4. Confirm the card and detail images render on the storefront through CloudFront.
+
+If the upload fails with `AccessControlListNotSupported`, the bucket has ACLs disabled and
+`default_acl` is not `None` — see the S3 section of the design spec.
 
 ---
 

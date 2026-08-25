@@ -16,7 +16,7 @@
       <div class="panel" style="margin-bottom: 18px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;border-bottom:1px solid var(--cream-dark);padding-bottom:12px;">
           <div>
-            <a href="{% url 'producer_detail' producer.slug %}" style="font-weight:700;color:var(--green-dark);">🌾 {{ producer.farm_name }}</a>
+            <a href="{% url 'producer-detail' pk=producer.pk slug=producer.slug %}" style="font-weight:700;color:var(--green-dark);">🌾 {{ producer.farm_name }}</a>
             {% if producer.location %}<div style="font-size:.8rem;color:var(--text-light);">📍 {{ producer.location }}</div>{% endif %}
           </div>
           {% if producer.badge %}
@@ -26,18 +26,18 @@
         {% for item in items %}
           <div style="display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px dashed var(--cream-dark);">
             <div style="width:60px;height:60px;border-radius:var(--radius-sm);overflow:hidden;background:var(--green-pale);display:flex;align-items:center;justify-content:center;font-size:1.6rem;flex-shrink:0;">
-              {% if item.product.image_url %}<img src="{{ item.product.image_url }}" alt="" style="width:100%;height:100%;object-fit:cover;">{% else %}{{ item.product.emoji|default:"🌾" }}{% endif %}
+              {% if item.product.image_card %}<img src="{{ item.product.image_card.url }}" alt="" style="width:100%;height:100%;object-fit:cover;">{% else %}{{ item.product.emoji|default:"🌾" }}{% endif %}
             </div>
             <div style="flex:1;">
               <div style="font-weight:600;">{{ item.product.name }}</div>
               <div style="font-size:.8rem;color:var(--text-light);">€{{ item.product.price }} / {{ item.product.unit_label|default:item.product.get_unit_display }}</div>
             </div>
-            <form method="post" action="{% url 'cart_update' item.product.pk %}" style="display:flex;gap:6px;align-items:center;">{% csrf_token %}
+            <form method="post" action="{% url 'cart-update' item.product.pk %}" style="display:flex;gap:6px;align-items:center;">{% csrf_token %}
               <input type="number" name="quantity" value="{{ item.quantity }}" min="0" class="form-input" style="width:70px;padding:6px 10px;">
               <button class="btn-secondary" style="padding:6px 12px;font-size:.85rem;" type="submit">Ενημέρωση</button>
             </form>
             <div style="font-weight:700;width:80px;text-align:right;">€{{ item.line_total }}</div>
-            <form method="post" action="{% url 'cart_remove' item.product.pk %}">{% csrf_token %}
+            <form method="post" action="{% url 'cart-remove' item.product.pk %}">{% csrf_token %}
               <button type="submit" style="color:var(--text-light);font-size:1.2rem;padding:4px 8px;" title="Αφαίρεση">✕</button>
             </form>
           </div>

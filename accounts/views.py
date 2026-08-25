@@ -1,23 +1,17 @@
 from django.contrib.auth import login
-from django.contrib.auth.forms import UserCreationForm
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 
-from .models import User
+from accounts.forms import SignupForm
 
 
-class SignupForm(UserCreationForm):
-    class Meta(UserCreationForm.Meta):
-        model = User
-        fields = ("username", "email")
-
-
-def signup(request):
-    if request.method == "POST":
+def signup(request: HttpRequest) -> HttpResponse:
+    """Register a customer account and sign them straight in."""
+    if request.method == 'POST':
         form = SignupForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            login(request, user)
-            return redirect("home")
+            login(request, form.save())
+            return redirect('home')
     else:
         form = SignupForm()
-    return render(request, "auth/signup.html", {"form": form})
+    return render(request, 'auth/signup.html', {'form': form})

@@ -5,12 +5,12 @@
 {% block content %}
 <section class="container" style="padding: 36px 24px;">
 
-  <a href="{% url 'producer_detail' product.producer.slug %}" class="see-all" style="display:inline-block;margin-bottom:18px;">← Πίσω στον {{ product.producer.farm_name }}</a>
+  <a href="{% url 'producer-detail' pk=product.producer.pk slug=product.producer.slug %}" class="see-all" style="display:inline-block;margin-bottom:18px;">← Πίσω στον {{ product.producer.farm_name }}</a>
 
   <div class="product-detail-card">
     <div class="product-detail-media">
-      {% if product.image_url %}
-        <img src="{{ product.image_url }}" alt="{{ product.name }}">
+      {% if product.image_detail %}
+        <img src="{{ product.image_detail.url }}" alt="{{ product.name }}">
       {% else %}
         <div class="product-detail-fallback">{{ product.emoji|default:"🌾" }}</div>
       {% endif %}
@@ -21,7 +21,7 @@
       {% endif %}
     </div>
     <div class="product-detail-info">
-      <a href="{% url 'producer_detail' product.producer.slug %}" class="product-detail-producer">
+      <a href="{% url 'producer-detail' pk=product.producer.pk slug=product.producer.slug %}" class="product-detail-producer">
         🌾 {{ product.producer.farm_name }}
         <span style="color:var(--text-light);font-weight:500;">· 📍 {{ product.producer.location }}</span>
       </a>
@@ -45,7 +45,7 @@
         {% endif %}
       </div>
 
-      <form method="post" action="{% url 'cart_add' product.pk %}" class="product-detail-form">
+      <form method="post" action="{% url 'cart-add' product.pk %}" class="product-detail-form">
         {% csrf_token %}
         <input type="number" name="quantity" value="1" min="1" max="{{ product.stock }}" class="form-input" style="width:100px;text-align:center;">
         <button class="btn-primary" type="submit" style="flex:1;padding:14px;font-size:1rem;" {% if product.stock == 0 %}disabled{% endif %}>
@@ -77,9 +77,9 @@
     <div class="products-grid">
       {% for p in related %}
         <div class="product-card">
-          <a href="{% url 'product_detail' p.pk %}">
-            {% if p.image_url %}
-              <img src="{{ p.image_url }}" alt="{{ p.name }}" class="product-img">
+          <a href="{% url 'product-detail' p.pk %}">
+            {% if p.image_card %}
+              <img src="{{ p.image_card.url }}" alt="{{ p.name }}" class="product-img">
             {% else %}
               <div class="product-img-fallback">{{ p.emoji|default:"🌾" }}</div>
             {% endif %}
@@ -88,7 +88,7 @@
             <div class="product-name">{{ p.name }}</div>
             <div class="product-unit">{{ p.unit_label|default:p.get_unit_display }}</div>
             <div class="product-price">€{{ p.price }}</div>
-            <form method="post" action="{% url 'cart_add' p.pk %}" style="margin-top:auto;">
+            <form method="post" action="{% url 'cart-add' p.pk %}" style="margin-top:auto;">
               {% csrf_token %}
               <input type="hidden" name="quantity" value="1">
               <button class="product-add" type="submit" {% if p.stock == 0 %}disabled{% endif %}>

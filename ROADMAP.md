@@ -8,7 +8,7 @@ Snapshot taken 2026-05-04, after the GaiaRoots → Opson rebrand and frontend pa
 - SQLite
 - Custom `accounts.User` with role (customer / producer / staff)
 - Session-based cart (`cart/cart.py`)
-- Vanilla CSS design system (`static/css/gaiaroots.css`) — no Tailwind, no build step
+- Vanilla CSS design system (`static/css/opson.css`) — no Tailwind, no build step
 - Vanilla JS for toasts, video modal, review form
 - Apps: `accounts`, `producers`, `catalog`, `cart`, `orders`
 

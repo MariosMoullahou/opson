@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}Opson — Τοπικοί Παραγωγοί{% endblock %}</title>
   <link rel="icon" type="image/svg+xml" href="{% static 'img/o_noborder.svg' %}">
-  <link rel="stylesheet" href="{% static 'css/gaiaroots.css' %}">
+  <link rel="stylesheet" href="{% static 'css/opson.css' %}">
 </head>
 <body>
 
@@ -23,11 +23,11 @@
     <nav class="header-nav">
       {% if user.is_authenticated %}
         {% if user.is_producer %}
-          <a href="{% url 'producer_dashboard' %}" class="nav-btn nav-btn-amber">
+          <a href="{% url 'producer-dashboard' %}" class="nav-btn nav-btn-amber">
             <span>🌾 Πίνακας Παραγωγού</span>
           </a>
         {% else %}
-          <a href="{% url 'my_orders' %}" class="nav-btn nav-btn-outline">
+          <a href="{% url 'my-orders' %}" class="nav-btn nav-btn-outline">
             <span>📦 Παραγγελίες</span>
           </a>
         {% endif %}
@@ -67,13 +67,13 @@
   {% block content %}{% endblock %}
 </main>
 
-<div class="toast" id="gaiaToast" role="status" aria-live="polite"></div>
+<div class="toast" id="opsonToast" role="status" aria-live="polite"></div>
 
 <script>
   (function () {
-    const toastEl = document.getElementById('gaiaToast');
+    const toastEl = document.getElementById('opsonToast');
     let toastTimer;
-    window.gaiaToast = function (msg, type) {
+    window.opsonToast = function (msg, type) {
       if (!toastEl) return;
       toastEl.textContent = msg;
       toastEl.classList.remove('toast-error', 'toast-info');
@@ -93,7 +93,7 @@
       {% for m in messages %}{ msg: "{{ m|escapejs }}", type: "{{ m.tags|default:'success'|escapejs }}" }{% if not forloop.last %},{% endif %}
       {% endfor %}
     ];
-    queue.forEach((item, i) => setTimeout(() => window.gaiaToast(item.msg, item.type), i * 350));
+    queue.forEach((item, i) => setTimeout(() => window.opsonToast(item.msg, item.type), i * 350));
   })();
 </script>
 {% endif %}
@@ -117,8 +117,8 @@
       <div class="footer-links">
         <a href="{% url 'signup' %}">Γίνε μέλος</a>
         {% if user.is_authenticated and user.is_producer %}
-          <a href="{% url 'producer_product_create' %}">Πρόσθεσε προϊόν</a>
-          <a href="{% url 'producer_dashboard' %}">Πίνακας</a>
+          <a href="{% url 'producer-product-create' %}">Πρόσθεσε προϊόν</a>
+          <a href="{% url 'producer-dashboard' %}">Πίνακας</a>
         {% endif %}
       </div>
     </div>
