@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}Opson — Τοπικοί Παραγωγοί{% endblock %}</title>
   <link rel="icon" type="image/svg+xml" href="{% static 'img/o_noborder.svg' %}">
-  <link rel="stylesheet" href="{% static 'css/gaiaroots.css' %}">
+  <link rel="stylesheet" href="{% static 'css/opson.css' %}">
 </head>
 <body>
 
@@ -67,13 +67,13 @@
   {% block content %}{% endblock %}
 </main>
 
-<div class="toast" id="gaiaToast" role="status" aria-live="polite"></div>
+<div class="toast" id="opsonToast" role="status" aria-live="polite"></div>
 
 <script>
   (function () {
-    const toastEl = document.getElementById('gaiaToast');
+    const toastEl = document.getElementById('opsonToast');
     let toastTimer;
-    window.gaiaToast = function (msg, type) {
+    window.opsonToast = function (msg, type) {
       if (!toastEl) return;
       toastEl.textContent = msg;
       toastEl.classList.remove('toast-error', 'toast-info');
@@ -93,7 +93,7 @@
       {% for m in messages %}{ msg: "{{ m|escapejs }}", type: "{{ m.tags|default:'success'|escapejs }}" }{% if not forloop.last %},{% endif %}
       {% endfor %}
     ];
-    queue.forEach((item, i) => setTimeout(() => window.gaiaToast(item.msg, item.type), i * 350));
+    queue.forEach((item, i) => setTimeout(() => window.opsonToast(item.msg, item.type), i * 350));
   })();
 </script>
 {% endif %}
