@@ -189,6 +189,11 @@ input, textarea, select { font-family: inherit; font-size: inherit; }
 .form-input, .form-textarea, .form-select { width: 100%; padding: 10px 14px; border: 1.5px solid var(--cream-dark); border-radius: var(--radius-sm); background: var(--white); color: var(--text-dark); transition: border-color var(--transition); }
 .form-input:focus, .form-textarea:focus, .form-select:focus { outline: none; border-color: var(--green-mid); }
 .form-textarea { min-height: 90px; resize: vertical; }
+.form-checkbox { width: auto; margin-right: 8px; }
+.form-help { display: block; margin-top: 5px; font-size: .78rem; color: var(--text-light); }
+.form-error { display: block; margin-top: 5px; font-size: .8rem; font-weight: 600; color: #991b1b; }
+.form-errors { margin-bottom: 16px; padding: 10px 14px; border-radius: var(--radius-sm); background: #fee2e2; color: #991b1b; font-size: .85rem; }
+.form-image-preview { width: 100%; max-width: 240px; border-radius: var(--radius-md); margin-bottom: 10px; }
 .btn-primary { padding: 10px 22px; background: var(--green-dark); color: var(--white); border-radius: var(--radius-md); font-weight: 600; transition: background var(--transition); }
 .btn-primary:hover { background: var(--green-mid); }
 .btn-secondary { padding: 8px 16px; background: var(--cream); color: var(--text-dark); border: 1.5px solid var(--cream-dark); border-radius: var(--radius-md); font-weight: 600; transition: background var(--transition); }

@@ -1,16 +1,16 @@
 from django.contrib.auth.models import AbstractUser
-from django.db import models
+from django.db.models import CharField
 
 
 class User(AbstractUser):
-    class Role(models.TextChoices):
-        CUSTOMER = "customer", "Customer"
-        PRODUCER = "producer", "Producer"
-        STAFF = "staff", "Staff"
+    """A marketplace account; the ones carrying a producer_profile are producers."""
 
-    role = models.CharField(max_length=16, choices=Role.choices, default=Role.CUSTOMER)
-    phone = models.CharField(max_length=32, blank=True)
+    phone = CharField(max_length=32, blank=True, default='')
+
+    class Meta:
+        verbose_name = 'User'
+        verbose_name_plural = 'Users'
 
     @property
-    def is_producer(self):
-        return self.role == self.Role.PRODUCER
+    def is_producer(self) -> bool:
+        return hasattr(self, 'producer_profile')

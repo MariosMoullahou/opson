@@ -1,5 +1,10 @@
 Django==5.1.4
-djangorestframework==3.16.1
 gunicorn==23.0.0
 whitenoise==6.8.2
 python-dotenv==1.0.1
+Pillow                     # image processing
+django-storages[s3]        # S3 backend
+boto3                      # AWS SDK
+django-cleanup             # orphaned file removal
+pytest                     # rule 10
+pytest-django

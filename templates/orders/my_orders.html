@@ -14,7 +14,7 @@
   {% else %}
     <div style="display:flex;flex-direction:column;gap:12px;">
       {% for o in orders %}
-        <a href="{% url 'order_detail' o.pk %}" class="panel" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+        <a href="{% url 'order-detail' o.pk %}" class="panel" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
           <div>
             <div style="font-weight:700;">Παραγγελία #{{ o.pk }}</div>
             <div style="font-size:.82rem;color:var(--text-light);">{{ o.created_at|date:"d M Y, H:i" }} · {{ o.sub_orders.count }} παραγωγ{{ o.sub_orders.count|pluralize:"ός,οί" }}</div>

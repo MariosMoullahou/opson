@@ -4,8 +4,8 @@
 
 {% block content %}
 <section class="producer-hero">
-  {% if producer.cover_url %}
-    <img src="{{ producer.cover_url }}" alt="" class="producer-hero-cover">
+  {% if producer.cover_detail %}
+    <img src="{{ producer.cover_detail.url }}" alt="" class="producer-hero-cover">
   {% else %}
     <div class="producer-hero-cover producer-hero-fallback">🌾</div>
   {% endif %}
@@ -51,9 +51,9 @@
   <div class="products-grid" style="margin-bottom: 48px;">
     {% for p in products %}
       <div class="product-card">
-        <a href="{% url 'product_detail' p.pk %}" style="display:block;">
-          {% if p.image_url %}
-            <img src="{{ p.image_url }}" alt="{{ p.name }}" class="product-img">
+        <a href="{% url 'product-detail' p.pk %}" style="display:block;">
+          {% if p.image_card %}
+            <img src="{{ p.image_card.url }}" alt="{{ p.name }}" class="product-img">
           {% else %}
             <div class="product-img-fallback">{{ p.emoji|default:"🌾" }}</div>
           {% endif %}
@@ -62,7 +62,7 @@
           <div class="product-name">{{ p.name }}</div>
           <div class="product-unit">{{ p.unit_label|default:p.get_unit_display }}</div>
           <div class="product-price">€{{ p.price }}</div>
-          <form method="post" action="{% url 'cart_add' p.pk %}" style="margin-top:auto;">
+          <form method="post" action="{% url 'cart-add' p.pk %}" style="margin-top:auto;">
             {% csrf_token %}
             <input type="hidden" name="quantity" value="1">
             <button class="product-add" type="submit" {% if p.stock == 0 %}disabled{% endif %}>

@@ -23,11 +23,11 @@
     <nav class="header-nav">
       {% if user.is_authenticated %}
         {% if user.is_producer %}
-          <a href="{% url 'producer_dashboard' %}" class="nav-btn nav-btn-amber">
+          <a href="{% url 'producer-dashboard' %}" class="nav-btn nav-btn-amber">
             <span>🌾 Πίνακας Παραγωγού</span>
           </a>
         {% else %}
-          <a href="{% url 'my_orders' %}" class="nav-btn nav-btn-outline">
+          <a href="{% url 'my-orders' %}" class="nav-btn nav-btn-outline">
             <span>📦 Παραγγελίες</span>
           </a>
         {% endif %}
@@ -117,8 +117,8 @@
       <div class="footer-links">
         <a href="{% url 'signup' %}">Γίνε μέλος</a>
         {% if user.is_authenticated and user.is_producer %}
-          <a href="{% url 'producer_product_create' %}">Πρόσθεσε προϊόν</a>
-          <a href="{% url 'producer_dashboard' %}">Πίνακας</a>
+          <a href="{% url 'producer-product-create' %}">Πρόσθεσε προϊόν</a>
+          <a href="{% url 'producer-dashboard' %}">Πίνακας</a>
         {% endif %}
       </div>
     </div>

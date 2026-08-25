@@ -1,10 +1,16 @@
-from django.contrib import admin
+from django.contrib.admin import ModelAdmin, register
 
-from .models import Producer
+from producers.models import Producer
 
 
-@admin.register(Producer)
-class ProducerAdmin(admin.ModelAdmin):
-    list_display = ("farm_name", "user", "village", "agroverify_id", "created_at")
-    search_fields = ("farm_name", "village", "agroverify_id")
-    prepopulated_fields = {"slug": ("farm_name",)}
+@register(Producer)
+class ProducerAdmin(ModelAdmin):
+    """Farms and workshops selling on the marketplace."""
+
+    list_display = ['farm_name', 'user', 'village', 'region', 'badge', 'agroverify_id', 'created_at']
+    list_filter = ['badge', 'region']
+    search_fields = ['farm_name', 'village', 'agroverify_id', 'user__username']
+    date_hierarchy = 'created_at'
+    list_select_related = ['user']
+    # Populated by Producer.save(); the admin's prepopulate widget ASCII-slugifies and erases Greek.
+    readonly_fields = ['slug', 'created_at', 'updated_at']

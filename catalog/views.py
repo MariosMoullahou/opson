@@ -1,9 +1,8 @@
 from django.db.models import Count, Q
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 
+from catalog.models import Product
 from producers.models import Producer
-
-from .models import Category, Product
 
 
 REELS = [
@@ -107,8 +106,12 @@ DEMO_REVIEWS = [
 ]
 
 
-def producer_detail(request, slug):
-    producer = get_object_or_404(Producer, slug=slug)
+def producer_detail(request, pk, slug):
+    """One producer's storefront. The slug is decorative; the pk is the identity."""
+    producer = get_object_or_404(Producer, pk=pk)
+    if slug != producer.slug:
+        # A renamed farm must not 404 on links already in the wild.
+        return redirect("producer-detail", pk=producer.pk, slug=producer.slug, permanent=True)
     products = producer.products.filter(is_active=True).select_related("category")
     return render(request, "catalog/producer_detail.html", {
         "producer": producer,

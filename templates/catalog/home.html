@@ -74,10 +74,10 @@
 
     <div class="producers-grid">
       {% for p in producers %}
-        <a href="{% url 'producer_detail' p.slug %}" class="producer-card">
+        <a href="{% url 'producer-detail' pk=p.pk slug=p.slug %}" class="producer-card">
           <div class="producer-cover-wrap">
-            {% if p.cover_url %}
-              <img src="{{ p.cover_url }}" alt="{{ p.farm_name }}" class="producer-cover">
+            {% if p.cover_card %}
+              <img src="{{ p.cover_card.url }}" alt="{{ p.farm_name }}" class="producer-cover">
             {% else %}
               <div class="producer-cover-fallback">🌾</div>
             {% endif %}

@@ -1,9 +1,11 @@
 from django.urls import path
 
-from . import views
+from producers import views
 
 urlpatterns = [
-    path("dashboard/", views.dashboard, name="producer_dashboard"),
-    path("suborder/<int:pk>/transition/", views.transition_suborder, name="producer_transition_suborder"),
-    path("products/new/", views.product_create, name="producer_product_create"),
+    path('', views.dashboard, name='producer-dashboard'),
+    path('profile/', views.profile_update, name='producer-profile'),
+    path('products/new/', views.product_create, name='producer-product-create'),
+    path('products/<int:pk>/edit/', views.product_update, name='producer-product-edit'),
+    path('suborders/<int:pk>/transition/', views.transition_suborder, name='producer-suborder-transition'),
 ]

@@ -4,47 +4,47 @@
 
 {% block content %}
 <section class="container" style="padding: 36px 24px; max-width: 720px;">
-  <h1 class="page-title">+ Πρόσθεσε νέο προϊόν</h1>
-  <p class="page-subtitle" style="margin-bottom: 24px;">Συμπλήρωσε τα στοιχεία του προϊόντος σου.</p>
+  {% if product %}
+    <h1 class="page-title">✎ Επεξεργασία προϊόντος</h1>
+    <p class="page-subtitle" style="margin-bottom: 24px;">{{ product.name }}</p>
+  {% else %}
+    <h1 class="page-title">+ Πρόσθεσε νέο προϊόν</h1>
+    <p class="page-subtitle" style="margin-bottom: 24px;">Συμπλήρωσε τα στοιχεία του προϊόντος σου.</p>
+  {% endif %}
 
-  <form method="post" class="panel">
+  {# enctype is what makes the file field arrive at all — without it the upload is silently dropped. #}
+  <form method="post" class="panel" enctype="multipart/form-data">
     {% csrf_token %}
+
+    {% if form.non_field_errors %}
+      <div class="form-errors">{{ form.non_field_errors }}</div>
+    {% endif %}
+
+    {% for field in form %}
+      {% if field.name != "image" %}
+        <div class="form-group">
+          <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}<small class="form-help">{{ field.help_text }}</small>{% endif %}
+          {% for error in field.errors %}<small class="form-error">{{ error }}</small>{% endfor %}
+        </div>
+      {% endif %}
+    {% endfor %}
+
     <div class="form-group">
-      <label class="form-label">Όνομα προϊόντος</label>
-      <input name="name" required class="form-input">
+      <label class="form-label" for="{{ form.image.id_for_label }}">Φωτογραφία προϊόντος</label>
+      {% if product.image_card %}
+        <img src="{{ product.image_card.url }}" alt="" class="form-image-preview">
+      {% endif %}
+      <input type="file" name="image" id="{{ form.image.id_for_label }}" class="form-input"
+             accept="image/jpeg,image/png,image/webp">
+      <small class="form-help">{{ form.image.help_text }}</small>
+      {% for error in form.image.errors %}<small class="form-error">{{ error }}</small>{% endfor %}
     </div>
-    <div class="form-group">
-      <label class="form-label">Περιγραφή</label>
-      <textarea name="description" rows="3" class="form-textarea"></textarea>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-      <div class="form-group">
-        <label class="form-label">Τιμή (€)</label>
-        <input name="price" type="number" step="0.01" required class="form-input">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Μονάδα</label>
-        <select name="unit" class="form-select">
-          {% for value, label in units %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Απόθεμα</label>
-        <input name="stock" type="number" required class="form-input">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Κατηγορία</label>
-        <select name="category" class="form-select">
-          <option value="">—</option>
-          {% for c in categories %}<option value="{{ c.pk }}">{{ c.emoji }} {{ c.name }}</option>{% endfor %}
-        </select>
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">URL εικόνας (προαιρετικό)</label>
-      <input name="image_url" class="form-input" placeholder="https://...">
-    </div>
-    <button class="btn-primary" type="submit" style="width:100%;padding:12px;">Προσθήκη προϊόντος</button>
+
+    <button class="btn-primary" type="submit" style="width:100%;padding:12px;">
+      {% if product %}Αποθήκευση{% else %}Προσθήκη προϊόντος{% endif %}
+    </button>
   </form>
 </section>
 {% endblock %}
